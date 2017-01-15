@@ -179,7 +179,7 @@ Library.
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include "Dynamics.h"
-using namespace std;
+//using namespace std;
 using namespace Eigen;
 const double s7071  = sqrt(0.5);
 void adjustLinks();
@@ -220,9 +220,10 @@ const double air_resistance = 250.0;  // There is an unexpected velocity buildup
 // This could be correct dynamics and nothing to slow down the motion of the linkage in x, or
 // it could be due to the matrix M[0] being ill-conditioned, which could lead to a faulty acceleration a[0].
 
-const double elasticity = 68650.0; // Note: Consider 34325.0 -- this elasticity, measured in dynes/cm, allows the four feet
+const double elasticity = 274600.0; //137300.0; //68650.0; // Note: Consider 34325.0 -- this elasticity, measured in dynes/cm, allows the four feet
 // to penetrate around 10 cm before the force upward on four feet equals the weight of the linkage.
-// With the weight compensated for, we don't need as much elasticity. 68650 supports 5 cm penetration
+// With the weight compensated for, we don't need as much elasticity. 68650 supports 5 cm penetration,
+// 137300 supports 2.5 cm penetration. 274600 allows 1.25 cm penetration.  Any elasticity must be accompanied by less weight compensation in the floor
 
 // Initialize quantities that will eventually control the linkage, set to 0.0 for floppy limbs
 const double rotElastic = 0.0; // For a value 10,000,000.0: 1000 g at a distance of 10 cm under aG needs counter torque
@@ -233,7 +234,7 @@ const double rotDamp = 100.0;  // This is mainly to try to counteract the spinni
 // they say in the aircraft simulator lingo in order to make the simulation more stable.
 
 // The acceleration of gravity vector is in the inertial frame, a right-handed coordinate system
-// whose x-axis [0] points to the right, whose y-axis [1] points up, and
+// whose x-axis [0] points to the right, whose y-2axis [1] points up, and
 // whose z-axis [2] points out of the screen towards the viewer.
 // The acceleration of gravity is negative in the y direction.
 // It is initialized here because of the quantities below which need it: mc, maG, J
@@ -310,7 +311,7 @@ void initialize()
     // All cylinder axes of meshes initially point up and the proximal hinge is at the bottom end.
     // For Qt3D graphics, the centre of the cylinder is the position of the cylinder, which
     // we take as the centre of mass at c[r]. Links are rotated into position prior to starting simulation.
-    p[0] = Vector3d(0.0, 22.0, 0.0); // this is  the initial position of link 0.
+    p[0] = Vector3d(10.0, 23.0, 0.0); // this is  the initial position of link 0.
     // The falling linkage should be stopped by the floor by the application of appropriate forces.
     // Proximal hinge positions could be updated from v[0] and a[0] by integration,
     // but to prevent errors accumulating, it is done here by adjustLinks()
@@ -367,10 +368,11 @@ void initialize()
         }
         // initialize some matrices for the links including the inertia matrix J
         // The moment of inertia of a cylindrical shell about one end is given by
-        double sym = m[r]*(0.333333*length[r]*length[r] + 0.5 * (double)radius[r] * (double)radius[r]);
+        // NB sym and nonsym are correct but we use false values for moments of inertia of links to get stability
+        // double sym = m[r]*(0.333333*length[r]*length[r] + 0.5 * (double)radius[r] * (double)radius[r]);
         // for (axes x and z in our case)
         // and
-        double nonsym = m[r] * radius[r] * radius[r];
+        // double nonsym = m[r] * radius[r] * radius[r];
         // for the axis of symmetry (y = 1 in our case).  We have had to use hollow spheres to increase stability
         // but this is temporary. Using the correct values gets you lots of nans in the output file.
         for(nr = 0; nr < nRows; ++nr)

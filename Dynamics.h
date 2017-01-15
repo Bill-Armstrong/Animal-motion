@@ -1,4 +1,5 @@
-/****************************************************************************
+#pragma once
+/*************************************************************************
 **
 ** Copyright (C) 2016 William W. Armstrong
 ** Contact: William W. Armstrong
@@ -171,12 +172,9 @@ apply, that proxy's public statement of acceptance of any version is
 permanent authorization for you to choose that version for the
 Library.
 ****************************************************************************/
-#pragma once
-
-// file DynaEigen.h
-
+// file Dynamics.h
 #include <Eigen/Dense>
-
+#include <vector>
 using namespace std;
 using namespace Eigen;
 

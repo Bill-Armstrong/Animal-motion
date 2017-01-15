@@ -188,18 +188,19 @@ Library.
 #include <Qt3DRender/QCameraLens>
 #include <Qt3DRender/QRenderAspect>
 #include <Qt3DExtras/QForwardRenderer>
-#include <Qt3DExtras/QPhongMaterial>
+//#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QGoochMaterial>
 #include <Qt3DExtras/QPlaneMesh>
 #include <Qt3DExtras/QCylinderMesh>
 #include "Dynamics.h"
 //#include <iostream>
 #include <fstream>
 #define radianstodegrees 57.29578049
-constexpr int movieSize = 1000; // Number of frames in the movie. If you want a longer movie, increase this.
+constexpr int movieSize = 10000; // Number of frames in the movie. If you want a longer movie, increase this.
 double movie[movieSize][36];
 //VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
 // Get a specific frame of the movie (since the movie doesn't yet work)
-int captureFrame = 999;
+int captureFrame = 9999;
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 void initialize();
 void motion();
@@ -225,6 +226,7 @@ int main(int argc, char *argv[])
     // We view the object from 40 cm distance
     cameraPosition = viewCentre;
     cameraPosition.setZ(viewCentre.z()-40.0f);
+    cameraPosition.setY(2.0f);
     // The view
     Qt3DExtras::Qt3DWindow view;
     QSurfaceFormat format;
@@ -278,19 +280,21 @@ Qt3DCore::QEntity *createScene()
     // The root entity contains components which make up the scene graph.
     Qt3DCore::QEntity *linkageFrame = new Qt3DCore::QEntity;
     // Material
-    Qt3DExtras::QPhongMaterial *material = new Qt3DExtras::QPhongMaterial(linkageFrame);
-    material->setDiffuse(QColor(QRgb(0x928327)));
+    //Qt3DExtras::QPhongMaterial *material = new Qt3DExtras::QPhongMaterial(linkageFrame);
+    //material->setDiffuse(QColor(QRgb(0x928327)));
+    Qt3DExtras::QGoochMaterial *material = new Qt3DExtras::QGoochMaterial(linkageFrame);
+    material->setShininess(20.0f);
     // Plane entity -- we put in a plane at floor level (y = 0)
     Qt3DCore::QEntity *planeEntity = new Qt3DCore::QEntity(linkageFrame);
     // Plane mesh
     // Note: plane size to be enlarged when Qt3D computes hidden surfaces correctly
     Qt3DExtras::QPlaneMesh *planeMesh = new Qt3DExtras::QPlaneMesh;
-    planeMesh->setWidth(18.0f);
-    planeMesh->setHeight(8.0f);
+    planeMesh->setWidth(180.0f);
+    planeMesh->setHeight(80.0f);
     // Plane transform
     Qt3DCore::QTransform *planeTransform = new Qt3DCore::QTransform;
     // Put the plane close to where hinge 0 of the linkage is (so we can see something!)
-    planeTransform->setTranslation(QVector3D(0.0f, (float)p[0](1), 0.0f));
+    planeTransform->setTranslation(QVector3D(0.0f, 0.0f, 0.0f));
     //Add plane components
     planeEntity->addComponent(planeMesh);
     planeEntity->addComponent(planeTransform);
@@ -299,7 +303,7 @@ Qt3DCore::QEntity *createScene()
     int fn = captureFrame;
     viewCentre = QVector3D(
                 movie[fn][21],
-                movie[fn][22],
+                20.0f, //movie[fn][22], we look 20 cm above the floor
                 movie[fn][23]); // These are the coordinates of the c.g. of link 0 of the specified frame
     // Linkage image data
     for(int n = 0; n < numlinks; n++)

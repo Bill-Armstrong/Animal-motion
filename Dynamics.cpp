@@ -171,13 +171,14 @@ apply, that proxy's public statement of acceptance of any version is
 permanent authorization for you to choose that version for the
 Library.
 ****************************************************************************/
-
 // file Dynamics.cpp
-
-#include "Dynamics.h"
 #include <Eigen/Dense>
+#include <vector>
+#include "Dynamics.h"
 //#include <iostream>
 #include <fstream>
+using namespace std;
+
 Matrix3d accuWltilde;
 Matrix3d accuW;
 Matrix3d accuQ;
@@ -431,7 +432,8 @@ void floorSupport()
     double masspenetration; // this divides the floor support proportionally to the mass of the link times its penetration
     double forceperunit; // the total upward force (not counting elasticity and viscosity) is a multiple of the weicht
     masspenetration = 0.0;
-    forceperunit =  0.6 * -14000.0*aG[1]; // the total force applied in the floor is half enough to support the weight
+    forceperunit =  0.28 * -14000.0*aG[1]; // the total force applied in the floor is a fraction of what
+    // is required to support the weight of the whole object.  This allows us to attenuate elasticity.
     // This force is applied to the links in the floor, and depends on their masses and penetrations
     // The rest of support comes from elasticity.
 
